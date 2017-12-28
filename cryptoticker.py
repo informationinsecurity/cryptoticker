@@ -98,8 +98,15 @@ ltchigh = 0
 ltclow = 100000
 btchighscore = ""
 btclowscore = ""
+btcold = 1
+btcdiff = 0
+ethold = 1
+ethdiff = 0
+ltcold = 1
+ltcdiff = 0
 
 class varupdate(threading.Thread):
+
         #Thread to update variables every 30 seconds
         def __init__(self, name):
                 threading.Thread.__init__(self)
@@ -128,7 +135,23 @@ class varupdate(threading.Thread):
                 global ethlow
                 global ltchigh
                 global ltclow
-                btchigh = open('.btchighscore', 'r+').read()
+                global btclow
+                global btcold
+
+                #global btcold2
+                global btcdiff
+                #global btcdiff2
+                global btcpct
+                global ethold
+		global ethdiff
+		global ethpct
+		global ltcold
+		global ltcpct
+		global ltcdiff	
+		#btcdiff2 = float(btcdiff)
+                #btcold2 = float(btcold)
+                os.system('clear')
+		btchigh = open('.btchighscore', 'r+').read()
                 btchigh = float(btchigh)
                 btclow = open('.btclowscore', 'r+').read()
                 btclow = float(btclow)
@@ -159,10 +182,19 @@ class varupdate(threading.Thread):
                                 urlltc = "https://api.gdax.com/products/LTC-USD/ticker"
                                 LTC = float(json.load(urllib.urlopen(urlltc))['price'])
                                 st = datetime.datetime.now()
+                                btcdiff = BTC - btcold
+                                btcpct = ((BTC - btcold) /btcold ) * 100
+                                ethdiff = ETH - ethold
+				ethpct = ((ETH - ethold) / ethold) * 100
+				ltcdiff = LTC - ltcold
+				ltcpct = ((LTC - ltcold) / ltcold) * 100
+				os.system('clear')
                                 print (st.strftime("%Y-%m-%d %H:%M:%S"))
-                                print("Current BTC Price: $" + str(BTC) + " | BTC High: $" + str(btchigh) + " | BTC Low: $" + str(btclow))
-                                print("Current ETH Price: $" + str(ETH) + " | ETH High: $" + str(ethhigh) + " | ETH Low: $" + str(ethlow))
-                                print("Current LTC Price: $" + str(LTC) + " | LTC High: $" + str(ltchigh) + " | LTC Low: $" + str(ltclow))
+                                print("Current BTC Price: $" + str(BTC) + " | Change of: $" + '{:.2f}'.format(btcdiff) + " %(" + '{:.3f}'.format(btcpct) + ")")
+                                print("Current ETH Price: $" + str(ETH) + " | Change of: $" + '{:.2f}'.format(ethdiff) + " %(" + '{:.3f}'.format(ethpct) + ")")
+                                print("Current LTC Price: $" + str(LTC) + " | Change of: $" + '{:.2f}'.format(ltcdiff) + " %(" + '{:.3f}'.format(ltcpct) + ")")
+                                #print("Prior BTC Price: " + str(btcold))
+                                #print("Difference between: $" + str(btcdiff))
                                 print "----------"
                                 if BTC < btclow: print("Old BTC Low: $" + str(btclow)); print("Current BTC price: $" + str(BTC)); btclow = BTC; print("New BTC Low: $" + str(btclow) + "\n----------"); l = open('.btclowscore', 'w'); l.write(str(btclow)); l.close()
                                 if BTC > btchigh: print("Old BTC High: $" + str(btchigh)); print("Current BTC price: $" + str(BTC)); btchigh = BTC; print("New BTC High: $" + str(btchigh)  + "\n----------"); l = open('.btchighscore', 'w'); l.write(str(btchigh)); l.close()
@@ -172,8 +204,10 @@ class varupdate(threading.Thread):
 
                                 if LTC < ltclow: print("Old LTC Low: $" + str(ltclow)); print("Current LTC price: $" + str(LTC)); ltclow = LTC; print("New LTC Low: $" + str(ltclow) + "\n----------"); l = open('.ltclowscore', 'w'); l.write(str(ltclow)); l.close()
                                 if LTC > ltchigh: print("Old LTC High: $" + str(ltchigh)); print("Current LTC price: $" + str(LTC)); ltchigh = LTC; print("New LTC High: $" + str(ltchigh) + "\n----------"); l = open('.ltchighscore', 'w'); l.write(str(ltchigh)); l.close()
-
-
+                                #btcdiff = BTC - btcold
+                                btcold = BTC
+				ethold = ETH
+				ltcold = LTC
                                 c.release()
                                 timer=15
                                 for i in range(15):
@@ -297,3 +331,4 @@ while True:
                 a.join()
                 b.join()
                 break
+
